@@ -135,6 +135,20 @@ ruleTester.run("no-implicit-boolean-conversion-in-conditions", rule, {
       code: "if (value == null) {}",
       options: [{ allowNullishCheck: true }],
     },
+    // allowBooleanIdentifiers: MemberExpression with is-prefix property
+    {
+      code: "if (this.isReady) {}",
+      options: [{ allowBooleanIdentifiers: true }],
+    },
+    // allowBooleanIdentifiers: MemberExpression with has-prefix property
+    {
+      code: "if (obj.hasPermission) {}",
+      options: [{ allowBooleanIdentifiers: true }],
+    },
+    // Negation of LogicalExpression with all explicit operands
+    {
+      code: 'if (!(a > 0 && b !== "")) {}',
+    },
   ],
   invalid: [
     // Simple identifier in if condition
@@ -220,6 +234,35 @@ ruleTester.run("no-implicit-boolean-conversion-in-conditions", rule, {
       code: "if (value) {}",
       options: [{ allowNullishCheck: true }],
       errors: [{ messageId: "noImplicitBooleanConversion" }],
+    },
+    // Loose null check with != is invalid with default options
+    {
+      code: "if (value != null) {}",
+      errors: [{ messageId: "noImplicitBooleanConversion" }],
+    },
+    // Loose null check with == is invalid with default options
+    {
+      code: "if (value == null) {}",
+      errors: [{ messageId: "noImplicitBooleanConversion" }],
+    },
+    // Loose equality without null is not explicit
+    {
+      code: "if (a == b) {}",
+      errors: [{ messageId: "noImplicitBooleanConversion" }],
+    },
+    // allowBooleanIdentifiers: MemberExpression without boolean-prefix property is still invalid
+    {
+      code: "if (obj.value) {}",
+      options: [{ allowBooleanIdentifiers: true }],
+      errors: [{ messageId: "noImplicitBooleanConversion" }],
+    },
+    // Negation of LogicalExpression with implicit operands reports 2 errors
+    {
+      code: "if (!(a && b)) {}",
+      errors: [
+        { messageId: "noImplicitBooleanConversion" },
+        { messageId: "noImplicitBooleanConversion" },
+      ],
     },
   ],
 });

@@ -18,8 +18,6 @@ const BOOLEAN_PREFIX_PATTERN = /^(is|has|should|can|will|was|did)[A-Z]/;
 const COMPARISON_OPERATORS = new Set([
   "===",
   "!==",
-  "==",
-  "!=",
   "<",
   ">",
   "<=",
@@ -28,25 +26,43 @@ const COMPARISON_OPERATORS = new Set([
   "in",
 ]);
 
+function isNullLiteral(node: TSESTree.Expression): boolean {
+  return node.type === "Literal" && node.value === null;
+}
+
 function isExplicitBoolean(
   node: TSESTree.Expression,
   allowBooleanIdentifiers: boolean,
+  allowNullishCheck: boolean,
 ): boolean {
   switch (node.type) {
     case "BinaryExpression":
-      return COMPARISON_OPERATORS.has(node.operator);
+      if (COMPARISON_OPERATORS.has(node.operator)) {
+        return true;
+      }
+      if (node.operator === "==" || node.operator === "!=") {
+        if (
+          allowNullishCheck &&
+          (isNullLiteral(node.left) || isNullLiteral(node.right))
+        ) {
+          return true;
+        }
+        return false;
+      }
+      return false;
 
     case "LogicalExpression":
       return (
-        isExplicitBoolean(node.left, allowBooleanIdentifiers) &&
-        isExplicitBoolean(node.right, allowBooleanIdentifiers)
+        isExplicitBoolean(node.left, allowBooleanIdentifiers, allowNullishCheck) &&
+        isExplicitBoolean(node.right, allowBooleanIdentifiers, allowNullishCheck)
       );
 
     case "UnaryExpression":
       if (node.operator === "!") {
         return isExplicitBoolean(
-          node.argument as TSESTree.Expression,
+          node.argument,
           allowBooleanIdentifiers,
+          allowNullishCheck,
         );
       }
       return false;
@@ -56,6 +72,17 @@ function isExplicitBoolean(
 
     case "Identifier":
       if (allowBooleanIdentifiers && BOOLEAN_PREFIX_PATTERN.test(node.name)) {
+        return true;
+      }
+      return false;
+
+    case "MemberExpression":
+      if (
+        allowBooleanIdentifiers &&
+        !node.computed &&
+        node.property.type === "Identifier" &&
+        BOOLEAN_PREFIX_PATTERN.test(node.property.name)
+      ) {
         return true;
       }
       return false;
@@ -73,13 +100,14 @@ function isExplicitBoolean(
 function collectImplicitNodes(
   node: TSESTree.Expression,
   allowBooleanIdentifiers: boolean,
+  allowNullishCheck: boolean,
   results: TSESTree.Node[],
 ): void {
   if (node.type === "LogicalExpression") {
-    collectImplicitNodes(node.left, allowBooleanIdentifiers, results);
-    collectImplicitNodes(node.right, allowBooleanIdentifiers, results);
+    collectImplicitNodes(node.left, allowBooleanIdentifiers, allowNullishCheck, results);
+    collectImplicitNodes(node.right, allowBooleanIdentifiers, allowNullishCheck, results);
   } else {
-    if (!isExplicitBoolean(node, allowBooleanIdentifiers)) {
+    if (!isExplicitBoolean(node, allowBooleanIdentifiers, allowNullishCheck)) {
       results.push(node);
     }
   }
@@ -119,11 +147,25 @@ const noImplicitBooleanConversionInConditions = createRule<
   create(context) {
     const options = context.options[0] || {};
     const allowBooleanIdentifiers = options.allowBooleanIdentifiers ?? false;
+    const allowNullishCheck = options.allowNullishCheck ?? false;
 
     function checkCondition(test: TSESTree.Expression): void {
-      if (test.type === "LogicalExpression") {
+      if (
+        test.type === "UnaryExpression" &&
+        test.operator === "!" &&
+        test.argument.type === "LogicalExpression"
+      ) {
         const implicitNodes: TSESTree.Node[] = [];
-        collectImplicitNodes(test, allowBooleanIdentifiers, implicitNodes);
+        collectImplicitNodes(test.argument, allowBooleanIdentifiers, allowNullishCheck, implicitNodes);
+        for (const node of implicitNodes) {
+          context.report({
+            node,
+            messageId: "noImplicitBooleanConversion",
+          });
+        }
+      } else if (test.type === "LogicalExpression") {
+        const implicitNodes: TSESTree.Node[] = [];
+        collectImplicitNodes(test, allowBooleanIdentifiers, allowNullishCheck, implicitNodes);
         for (const node of implicitNodes) {
           context.report({
             node,
@@ -131,7 +173,7 @@ const noImplicitBooleanConversionInConditions = createRule<
           });
         }
       } else {
-        if (!isExplicitBoolean(test, allowBooleanIdentifiers)) {
+        if (!isExplicitBoolean(test, allowBooleanIdentifiers, allowNullishCheck)) {
           context.report({
             node: test,
             messageId: "noImplicitBooleanConversion",
