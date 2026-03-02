@@ -34,18 +34,18 @@ const DEFAULT_NEGATIVE_WORDS = [
   "unregistered",
   "unauthorized",
   "unregister",
-  "disconnect",
-  "disapprove",
-  "incomplete",
-  "impossible",
-  "nonsense",
-  "noncompliant",
 ];
 
 /**
  * Split a camelCase identifier into parts at uppercase boundaries.
  * e.g. "isNotDisabled" -> ["is", "Not", "Disabled"]
  * e.g. "cannotUnregister" -> ["cannot", "Unregister"]
+ *
+ * Limitations:
+ * - Does not handle digits (e.g. "html5Parser" is split as ["html5", "Parser"]).
+ * - Does not handle consecutive uppercase / acronyms (e.g. "parseXMLNode" becomes
+ *   ["parse", "X", "M", "L", "Node"] instead of ["parse", "XML", "Node"]).
+ *   This is acceptable because the primary target is standard camelCase identifiers.
  */
 function splitCamelCase(name: string): string[] {
   const parts: string[] = [];
@@ -71,9 +71,11 @@ function splitCamelCase(name: string): string[] {
  * Strategy:
  * 1. Split the identifier into camelCase parts.
  * 2. Scan from left to find a negative prefix among the parts.
- * 3. After finding a negative prefix, check if the remaining portion
- *    (joined back together, lowercased) contains any negative word from
- *    the negativeWords list.
+ * 3. After finding a negative prefix, check if the remaining camelCase parts
+ *    (joined from the start) match any negative word exactly. This avoids
+ *    false positives from substring matching.
+ * 4. Also check if the remainder starts with another negative prefix
+ *    (e.g., "notDisconnect" -> "not" + "dis…").
  */
 function hasDoubleNegative(name: string, negativeWords: string[]): boolean {
   const parts = splitCamelCase(name);
@@ -86,24 +88,31 @@ function hasDoubleNegative(name: string, negativeWords: string[]): boolean {
     const part = lowerParts[i];
     const matchedPrefix = NEGATIVE_PREFIXES.find((prefix) => part === prefix);
     if (matchedPrefix) {
-      // The remainder starts after this part
-      const remainder = parts
-        .slice(i + 1)
-        .join("")
-        .toLowerCase();
-      if (remainder.length === 0) continue;
+      // The remainder is the parts after the matched prefix.
+      const remainderParts = parts.slice(i + 1);
+      if (remainderParts.length === 0) continue;
+      const remainderLower = remainderParts.map((p) => p.toLowerCase());
 
-      // Check if the remainder itself contains a negative word
+      // Check if the remainder matches a negative word at a camelCase boundary.
+      // We join consecutive parts from the start and check whether the joined
+      // string equals a negative word. This avoids false positives from
+      // substring matching (e.g. "invalidated" should not match "invalid").
       for (const word of negativeWords) {
-        if (remainder.includes(word.toLowerCase())) {
-          return true;
+        const lowerWord = word.toLowerCase();
+        let joined = "";
+        for (const rp of remainderLower) {
+          joined += rp;
+          if (joined === lowerWord) {
+            return true;
+          }
         }
       }
 
       // Also check if the remainder starts with a negative prefix
-      // followed by more content (e.g., "Unregister" -> "un" + "register")
+      // followed by more content (e.g., "notDisconnect" -> "not" + "dis" + "connect")
+      const remainderStr = remainderLower.join("");
       for (const prefix of NEGATIVE_PREFIXES) {
-        if (remainder.startsWith(prefix) && remainder.length > prefix.length) {
+        if (remainderStr.startsWith(prefix) && remainderStr.length > prefix.length) {
           return true;
         }
       }
