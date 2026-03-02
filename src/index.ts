@@ -1,5 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils";
 import noDoubleNegativeIdentifiers from "./rules/no-double-negative-identifiers.js";
+import noOverloadedFlagParameter from "./rules/no-overloaded-flag-parameter.js";
 import noSingleLetterVariables from "./rules/no-single-letter-variables.js";
 
 const plugin = {
@@ -9,6 +10,7 @@ const plugin = {
   },
   rules: {
     "no-double-negative-identifiers": noDoubleNegativeIdentifiers,
+    "no-overloaded-flag-parameter": noOverloadedFlagParameter,
     "no-single-letter-variables": noSingleLetterVariables,
   },
   configs: {} as Record<string, TSESLint.FlatConfig.Config>,
@@ -21,6 +23,7 @@ Object.assign(plugin.configs, {
     },
     rules: {
       "ai-readable/no-double-negative-identifiers": "warn",
+      "ai-readable/no-overloaded-flag-parameter": "warn",
       "ai-readable/no-single-letter-variables": "warn",
     },
   },
