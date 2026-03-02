@@ -12,35 +12,41 @@ This rule reports conditions that exceed the allowed number of logical operators
 
 ```js
 // Too many operators (default max: 2)
-if (a && b || c && d) {}
+if ((a && b) || (c && d)) {
+}
 
-if ((a && b) || (!c && d) || e) {}
+if ((a && b) || (!c && d) || e) {
+}
 
-while (a && b || c && d) {}
+while ((a && b) || (c && d)) {}
 
-const x = a && b || c && d ? 1 : 0;
+const x = (a && b) || (c && d) ? 1 : 0;
 
 // Too deep nesting (default max: 2)
-if (a && (b || (c && d))) {}
+if (a && (b || (c && d))) {
+}
 ```
 
 ### Examples of **correct** code
 
 ```js
 // Simple conditions within limits
-if (a && b) {}
+if (a && b) {
+}
 
-if (a && b || c) {}
+if ((a && b) || c) {
+}
 
 // Complex conditions extracted into named intermediates
 const canProceed = (a && b) || (!c && d) || e;
-if (canProceed) {}
+if (canProceed) {
+}
 
-const isValid = a && b || c && d;
+const isValid = (a && b) || (c && d);
 while (isValid) {}
 
-const shouldContinue = a && b || c && d;
-for (; shouldContinue;) {}
+const shouldContinue = (a && b) || (c && d);
+for (; shouldContinue; ) {}
 ```
 
 ## Options
@@ -56,9 +62,12 @@ Maximum number of logical operators (`&&`, `||`, `??`, `!`) allowed in a single 
 
 ```json
 {
-  "ai-readable/require-named-intermediate-for-complex-condition": ["warn", {
-    "maxOperators": 3
-  }]
+  "ai-readable/require-named-intermediate-for-complex-condition": [
+    "warn",
+    {
+      "maxOperators": 3
+    }
+  ]
 }
 ```
 
@@ -71,9 +80,12 @@ Maximum nesting depth of logical expressions. Chains of the same operator (e.g.,
 
 ```json
 {
-  "ai-readable/require-named-intermediate-for-complex-condition": ["warn", {
-    "maxDepth": 3
-  }]
+  "ai-readable/require-named-intermediate-for-complex-condition": [
+    "warn",
+    {
+      "maxDepth": 3
+    }
+  ]
 }
 ```
 

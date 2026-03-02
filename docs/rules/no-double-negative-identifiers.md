@@ -60,9 +60,12 @@ Built-in negative words: `disabled`, `invalid`, `unknown`, `unavailable`, `inact
 
 ```json
 {
-  "ai-readable/no-double-negative-identifiers": ["warn", {
-    "negativeWords": ["forbidden", "rejected"]
-  }]
+  "ai-readable/no-double-negative-identifiers": [
+    "warn",
+    {
+      "negativeWords": ["forbidden", "rejected"]
+    }
+  ]
 }
 ```
 
@@ -75,9 +78,12 @@ Identifier names to exclude from this rule.
 
 ```json
 {
-  "ai-readable/no-double-negative-identifiers": ["warn", {
-    "allowList": ["isNotDisabled"]
-  }]
+  "ai-readable/no-double-negative-identifiers": [
+    "warn",
+    {
+      "allowList": ["isNotDisabled"]
+    }
+  ]
 }
 ```
 
@@ -90,9 +96,12 @@ Whether to check object property names.
 
 ```json
 {
-  "ai-readable/no-double-negative-identifiers": ["warn", {
-    "checkProperties": false
-  }]
+  "ai-readable/no-double-negative-identifiers": [
+    "warn",
+    {
+      "checkProperties": false
+    }
+  ]
 }
 ```
 
