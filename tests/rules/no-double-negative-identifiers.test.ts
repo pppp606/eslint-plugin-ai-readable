@@ -29,6 +29,19 @@ ruleTester.run("no-double-negative-identifiers", rule, {
     {
       code: "const isUnknown = false;",
     },
+    // Words that start with a negative prefix but are not double negatives
+    {
+      code: "const isDisconnected = true;",
+    },
+    {
+      code: "const isIncomplete = true;",
+    },
+    {
+      code: "const isImpossible = true;",
+    },
+    {
+      code: "const hasNonsense = true;",
+    },
     // checkProperties: false allows double-negative in properties
     {
       code: "const obj = { isNotDisabled: true };",
@@ -61,7 +74,7 @@ ruleTester.run("no-double-negative-identifiers", rule, {
       code: "const fn = function isNotInvalid() {};",
       errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
     },
-    // ArrowFunctionExpression variable name: not + disabled
+    // VariableDeclarator (arrow function assigned to variable): not + disabled
     {
       code: "const isNotDisabled = () => {};",
       errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
@@ -89,6 +102,37 @@ ruleTester.run("no-double-negative-identifiers", rule, {
     // non + invalid pattern
     {
       code: "const isNonInvalid = true;",
+      errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // Words removed from DEFAULT_NEGATIVE_WORDS are still caught via prefix-in-prefix detection
+    // not + dis+connect
+    {
+      code: "const notDisconnect = true;",
+      errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // not + dis+approve
+    {
+      code: "const notDisapprove = true;",
+      errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // not + in+complete
+    {
+      code: "const notIncomplete = true;",
+      errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // not + im+possible
+    {
+      code: "const notImpossible = true;",
+      errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // not + non+sense
+    {
+      code: "const notNonsense = true;",
+      errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // not + non+compliant
+    {
+      code: "const notNoncompliant = true;",
       errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
     },
     // negativeWords option: custom word "forbidden" detected
