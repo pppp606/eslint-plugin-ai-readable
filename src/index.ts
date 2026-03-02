@@ -2,6 +2,7 @@ import type { TSESLint } from "@typescript-eslint/utils";
 import noDoubleNegativeIdentifiers from "./rules/no-double-negative-identifiers.js";
 import noOverloadedFlagParameter from "./rules/no-overloaded-flag-parameter.js";
 import noImplicitBooleanConversionInConditions from "./rules/no-implicit-boolean-conversion-in-conditions.js";
+import requireNamedIntermediateForComplexCondition from "./rules/require-named-intermediate-for-complex-condition.js";
 import noSingleLetterVariables from "./rules/no-single-letter-variables.js";
 
 const plugin = {
@@ -15,6 +16,8 @@ const plugin = {
       noImplicitBooleanConversionInConditions,
     "no-overloaded-flag-parameter": noOverloadedFlagParameter,
     "no-single-letter-variables": noSingleLetterVariables,
+    "require-named-intermediate-for-complex-condition":
+      requireNamedIntermediateForComplexCondition,
   },
   configs: {} as Record<string, TSESLint.FlatConfig.Config>,
 };
@@ -29,6 +32,7 @@ Object.assign(plugin.configs, {
       "ai-readable/no-implicit-boolean-conversion-in-conditions": "warn",
       "ai-readable/no-overloaded-flag-parameter": "warn",
       "ai-readable/no-single-letter-variables": "warn",
+      "ai-readable/require-named-intermediate-for-complex-condition": "warn",
     },
   },
 });
