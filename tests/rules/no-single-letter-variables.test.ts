@@ -23,6 +23,16 @@ ruleTester.run("no-single-letter-variables", rule, {
     {
       code: "let result: string = 'hello';",
     },
+    // Destructuring: multi-character names are allowed
+    {
+      code: "const { name } = obj;",
+    },
+    {
+      code: "const [item] = arr;",
+    },
+    {
+      code: "const { name: fullName } = obj;",
+    },
   ],
   invalid: [
     // JS: single-letter variable names are disallowed
@@ -42,6 +52,27 @@ ruleTester.run("no-single-letter-variables", rule, {
     {
       code: "let y: string = 'hello';",
       errors: [{ messageId: "noSingleLetterVariables" }],
+    },
+    // Destructuring: single-letter names in object destructuring
+    {
+      code: "const { x } = obj;",
+      errors: [{ messageId: "noSingleLetterVariables" }],
+    },
+    {
+      code: "const { name: n } = obj;",
+      errors: [{ messageId: "noSingleLetterVariables" }],
+    },
+    // Destructuring: single-letter names in array destructuring
+    {
+      code: "const [x] = arr;",
+      errors: [{ messageId: "noSingleLetterVariables" }],
+    },
+    {
+      code: "const [a, b] = arr;",
+      errors: [
+        { messageId: "noSingleLetterVariables" },
+        { messageId: "noSingleLetterVariables" },
+      ],
     },
   ],
 });

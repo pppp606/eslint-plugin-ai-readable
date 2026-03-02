@@ -1,4 +1,4 @@
-import { ESLintUtils } from "@typescript-eslint/utils";
+import { ESLintUtils, type TSESTree } from "@typescript-eslint/utils";
 
 const createRule = ESLintUtils.RuleCreator(
   (name) =>
@@ -23,17 +23,46 @@ const noSingleLetterVariables = createRule<Options, MessageIds>({
   },
   defaultOptions: [],
   create(context) {
+    function reportIfSingleLetter(node: TSESTree.Node): void {
+      if (node.type === "Identifier" && node.name.length === 1) {
+        context.report({
+          node,
+          messageId: "noSingleLetterVariables",
+          data: { name: node.name },
+        });
+      }
+    }
+
+    function checkPattern(pattern: TSESTree.Node): void {
+      switch (pattern.type) {
+        case "Identifier":
+          reportIfSingleLetter(pattern);
+          break;
+        case "ObjectPattern":
+          for (const prop of pattern.properties) {
+            if (prop.type === "Property") {
+              checkPattern(prop.value);
+            } else {
+              checkPattern(prop);
+            }
+          }
+          break;
+        case "ArrayPattern":
+          for (const element of pattern.elements) {
+            if (element) {
+              checkPattern(element);
+            }
+          }
+          break;
+        case "AssignmentPattern":
+          checkPattern(pattern.left);
+          break;
+      }
+    }
+
     return {
       VariableDeclarator(node) {
-        if (node.id.type === "Identifier" && node.id.name.length === 1) {
-          context.report({
-            node: node.id,
-            messageId: "noSingleLetterVariables",
-            data: {
-              name: node.id.name,
-            },
-          });
-        }
+        checkPattern(node.id);
       },
     };
   },
