@@ -56,7 +56,7 @@ Default: `[]`
 
 Additional negative words to detect beyond the built-in list. These words are added to the default list.
 
-Built-in negative words: `disabled`, `invalid`, `unknown`, `unavailable`, `inactive`, `unregistered`, `unauthorized`, `unregister`, `disconnect`, `disapprove`, `incomplete`, `impossible`, `nonsense`, `noncompliant`.
+Built-in negative words: `disabled`, `invalid`, `unknown`, `unavailable`, `inactive`, `unregistered`, `unauthorized`, `unregister`.
 
 ```json
 {
@@ -95,6 +95,24 @@ Whether to check object property names.
   }]
 }
 ```
+
+## Detection Scope
+
+This rule checks the following identifier types:
+
+- **Variable declarations** (`const`, `let`, `var`) -- including arrow functions assigned to variables
+- **Function declarations** (`function foo() {}`)
+- **Named function expressions** (`const fn = function foo() {}`)
+- **Method definitions** (`class Foo { bar() {} }`)
+- **Object property names** (when `checkProperties` is enabled, which is the default)
+
+The following are **not** checked by this rule:
+
+- Function parameter names
+- Class field / property declarations (TypeScript)
+- Type aliases and interface names
+- Enum members
+- Import / export identifiers
 
 ## When Not To Use It
 
