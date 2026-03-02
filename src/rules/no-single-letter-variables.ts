@@ -2,7 +2,7 @@ import { ESLintUtils, type TSESTree } from "@typescript-eslint/utils";
 
 const createRule = ESLintUtils.RuleCreator(
   (name) =>
-    `https://github.com/takuto/eslint-plugin-ai-readable/blob/main/docs/rules/${name}.md`,
+    `https://github.com/pppp606/eslint-plugin-ai-readable/blob/main/docs/rules/${name}.md`,
 );
 
 type MessageIds = "noSingleLetterVariables";
