@@ -14,7 +14,7 @@ type Options = [
 ];
 
 /**
- * Count all logical operators (&&, ||, !) in an expression tree.
+ * Count all logical operators (&&, ||, ??, !) in an expression tree.
  * Only recurses into LogicalExpression and UnaryExpression with '!' operator.
  */
 function countOperators(node: TSESTree.Expression): number {
@@ -28,7 +28,7 @@ function countOperators(node: TSESTree.Expression): number {
 }
 
 /**
- * Calculate the maximum nesting depth of LogicalExpression nodes.
+ * Calculate the maximum nesting depth of LogicalExpression nodes (&&, ||, ??).
  * A single LogicalExpression (or chain of same-operator LogicalExpressions) is depth 1.
  * Depth only increases when a child LogicalExpression has a different operator
  * than its parent, representing true nesting rather than simple chaining.

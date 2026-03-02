@@ -67,6 +67,14 @@ ruleTester.run("require-named-intermediate-for-complex-condition", rule, {
     {
       code: "const shouldContinue = a && b || c && d; for (; shouldContinue;) {}",
     },
+    // Nullish coalescing within limit (2 operators: ??, ||)
+    {
+      code: "if (a ?? b || c) {}",
+    },
+    // For loop with no test expression
+    {
+      code: "for (;;) {}",
+    },
   ],
   invalid: [
     // Too many operators: 3 operators (&&, ||, &&), default max is 2
@@ -162,6 +170,16 @@ ruleTester.run("require-named-intermediate-for-complex-condition", rule, {
         {
           messageId: "tooDeep",
           data: { depth: "3", max: "1" },
+        },
+      ],
+    },
+    // Nullish coalescing mixed with && exceeding limit: 3 operators (??, &&, ??)
+    {
+      code: "if (a ?? b && c ?? d) {}",
+      errors: [
+        {
+          messageId: "tooManyOperators",
+          data: { count: "3", max: "2" },
         },
       ],
     },
