@@ -23,6 +23,7 @@ function getCalleeName(node: TSESTree.Expression): string | null {
   }
   if (
     node.type === "MemberExpression" &&
+    !node.computed &&
     node.property.type === "Identifier"
   ) {
     const objectName = getCalleeName(node.object);
@@ -50,7 +51,8 @@ const noOverloadedFlagParameter = createRule<Options, MessageIds>({
         type: "object",
         properties: {
           maxAllowedBooleanArgs: {
-            type: "number",
+            type: "integer",
+            minimum: 0,
           },
           ignorePattern: {
             type: "string",
@@ -64,16 +66,19 @@ const noOverloadedFlagParameter = createRule<Options, MessageIds>({
   create(context) {
     const options = context.options[0] || {};
     const maxAllowedBooleanArgs = options.maxAllowedBooleanArgs ?? 0;
-    const ignorePattern = options.ignorePattern
-      ? new RegExp(options.ignorePattern)
-      : null;
+    let ignorePattern: RegExp | null = null;
+    if (options.ignorePattern) {
+      try {
+        ignorePattern = new RegExp(options.ignorePattern);
+      } catch {
+        // Invalid regex pattern is silently ignored
+      }
+    }
 
     function checkArguments(
       node: TSESTree.CallExpression | TSESTree.NewExpression,
     ): void {
-      const callee =
-        node.type === "CallExpression" ? node.callee : node.callee;
-      const calleeName = getCalleeName(callee);
+      const calleeName = getCalleeName(node.callee);
 
       if (calleeName && ignorePattern && ignorePattern.test(calleeName)) {
         return;
