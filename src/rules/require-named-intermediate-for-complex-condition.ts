@@ -47,6 +47,9 @@ function calcDepth(
       )
     );
   }
+  if (node.type === "UnaryExpression" && node.operator === "!") {
+    return calcDepth(node.argument, parentOperator);
+  }
   return 0;
 }
 
@@ -89,27 +92,12 @@ const requireNamedIntermediateForComplexCondition = createRule<
     const options = context.options[0] || {};
     const maxOperators = options.maxOperators ?? 2;
     const maxDepth = options.maxDepth ?? 2;
-    const hasExplicitMaxOperators = options.maxOperators !== undefined;
-    const hasExplicitMaxDepth = options.maxDepth !== undefined;
 
     function checkCondition(test: TSESTree.Expression): void {
       const operatorCount = countOperators(test);
       const depth = calcDepth(test);
 
-      // Determine whether to check operator count:
-      // - If maxOperators was explicitly set: always check
-      // - If maxDepth was explicitly set (but not maxOperators): skip operator check
-      // - If neither was set (defaults): check only when depth is within limit
-      let shouldCheckOperators: boolean;
-      if (hasExplicitMaxOperators) {
-        shouldCheckOperators = true;
-      } else if (hasExplicitMaxDepth) {
-        shouldCheckOperators = false;
-      } else {
-        shouldCheckOperators = depth <= maxDepth;
-      }
-
-      if (shouldCheckOperators && operatorCount > maxOperators) {
+      if (operatorCount > maxOperators) {
         context.report({
           node: test,
           messageId: "tooManyOperators",

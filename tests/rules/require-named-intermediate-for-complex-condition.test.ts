@@ -45,7 +45,7 @@ ruleTester.run("require-named-intermediate-for-complex-condition", rule, {
     // Custom maxDepth allowing deeper nesting (depth 3, maxDepth: 4)
     {
       code: "if (a && (b || (c && d))) {}",
-      options: [{ maxDepth: 4 }],
+      options: [{ maxOperators: 4, maxDepth: 4 }],
     },
     // Named intermediate used in while loop
     {
@@ -66,6 +66,10 @@ ruleTester.run("require-named-intermediate-for-complex-condition", rule, {
     // Named intermediate used in for loop
     {
       code: "const shouldContinue = a && b || c && d; for (; shouldContinue;) {}",
+    },
+    // Negated condition within limit: !(a && b) has depth 1, operators 2 (!, &&)
+    {
+      code: "if (!(a && b)) {}",
     },
     // Nullish coalescing within limit (2 operators: ??, ||)
     {
@@ -137,10 +141,38 @@ ruleTester.run("require-named-intermediate-for-complex-condition", rule, {
         },
       ],
     },
-    // Too deep nesting: depth 3 (a && (b || (c && d))), default max is 2
+    // Too deep nesting: depth 3 (a && (b || (c && d))), default max is 2; also 3 operators exceeding max 2
     {
       code: "if (a && (b || (c && d))) {}",
       errors: [
+        {
+          messageId: "tooManyOperators",
+          data: { count: "3", max: "2" },
+        },
+        {
+          messageId: "tooDeep",
+          data: { depth: "3", max: "2" },
+        },
+      ],
+    },
+    // Negated nested condition: !(a && (b || c)) has depth 2, operators 3 (!, &&, ||) exceeding max 2
+    {
+      code: "if (!(a && (b || c))) {}",
+      errors: [
+        {
+          messageId: "tooManyOperators",
+          data: { count: "3", max: "2" },
+        },
+      ],
+    },
+    // Deeply negated condition: !(a && (b || (c && d))) has depth 3 exceeding max 2, operators 4
+    {
+      code: "if (!(a && (b || (c && d)))) {}",
+      errors: [
+        {
+          messageId: "tooManyOperators",
+          data: { count: "4", max: "2" },
+        },
         {
           messageId: "tooDeep",
           data: { depth: "3", max: "2" },
@@ -175,7 +207,7 @@ ruleTester.run("require-named-intermediate-for-complex-condition", rule, {
     },
     // Nullish coalescing mixed with && exceeding limit: 3 operators (??, &&, ??)
     {
-      code: "if (a ?? b && c ?? d) {}",
+      code: "if ((a ?? b) && (c ?? d)) {}",
       errors: [
         {
           messageId: "tooManyOperators",
