@@ -63,6 +63,7 @@ The following are **not** checked by this rule:
 - Object property names (keys)
 - Import / export identifiers
 - Type aliases and interface names
+- Rest element patterns in destructuring (`...rest`)
 
 ## When Not To Use It
 
