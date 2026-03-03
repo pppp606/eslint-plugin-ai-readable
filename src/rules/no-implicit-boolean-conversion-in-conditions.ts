@@ -53,8 +53,16 @@ function isExplicitBoolean(
 
     case "LogicalExpression":
       return (
-        isExplicitBoolean(node.left, allowBooleanIdentifiers, allowNullishCheck) &&
-        isExplicitBoolean(node.right, allowBooleanIdentifiers, allowNullishCheck)
+        isExplicitBoolean(
+          node.left,
+          allowBooleanIdentifiers,
+          allowNullishCheck,
+        ) &&
+        isExplicitBoolean(
+          node.right,
+          allowBooleanIdentifiers,
+          allowNullishCheck,
+        )
       );
 
     case "UnaryExpression":
@@ -104,8 +112,18 @@ function collectImplicitNodes(
   results: TSESTree.Node[],
 ): void {
   if (node.type === "LogicalExpression") {
-    collectImplicitNodes(node.left, allowBooleanIdentifiers, allowNullishCheck, results);
-    collectImplicitNodes(node.right, allowBooleanIdentifiers, allowNullishCheck, results);
+    collectImplicitNodes(
+      node.left,
+      allowBooleanIdentifiers,
+      allowNullishCheck,
+      results,
+    );
+    collectImplicitNodes(
+      node.right,
+      allowBooleanIdentifiers,
+      allowNullishCheck,
+      results,
+    );
   } else {
     if (!isExplicitBoolean(node, allowBooleanIdentifiers, allowNullishCheck)) {
       results.push(node);
@@ -113,95 +131,106 @@ function collectImplicitNodes(
   }
 }
 
-const noImplicitBooleanConversionInConditions = createRule<
-  Options,
-  MessageIds
->({
-  name: "no-implicit-boolean-conversion-in-conditions",
-  meta: {
-    type: "suggestion",
-    docs: {
-      description:
-        "Disallow implicit boolean conversions in conditional expressions",
-    },
-    messages: {
-      noImplicitBooleanConversion:
-        "Avoid implicit boolean conversion. Use an explicit comparison instead (e.g., value !== null, items.length > 0).",
-    },
-    schema: [
-      {
-        type: "object",
-        properties: {
-          allowBooleanIdentifiers: {
-            type: "boolean",
-          },
-          allowNullishCheck: {
-            type: "boolean",
-          },
-        },
-        additionalProperties: false,
+const noImplicitBooleanConversionInConditions = createRule<Options, MessageIds>(
+  {
+    name: "no-implicit-boolean-conversion-in-conditions",
+    meta: {
+      type: "suggestion",
+      docs: {
+        description:
+          "Disallow implicit boolean conversions in conditional expressions",
       },
-    ],
-  },
-  defaultOptions: [{}],
-  create(context) {
-    const options = context.options[0] || {};
-    const allowBooleanIdentifiers = options.allowBooleanIdentifiers ?? false;
-    const allowNullishCheck = options.allowNullishCheck ?? false;
+      messages: {
+        noImplicitBooleanConversion:
+          "Avoid implicit boolean conversion. Use an explicit comparison instead (e.g., value !== null, items.length > 0).",
+      },
+      schema: [
+        {
+          type: "object",
+          properties: {
+            allowBooleanIdentifiers: {
+              type: "boolean",
+            },
+            allowNullishCheck: {
+              type: "boolean",
+            },
+          },
+          additionalProperties: false,
+        },
+      ],
+    },
+    defaultOptions: [{}],
+    create(context) {
+      const options = context.options[0] || {};
+      const allowBooleanIdentifiers = options.allowBooleanIdentifiers ?? false;
+      const allowNullishCheck = options.allowNullishCheck ?? false;
 
-    function checkCondition(test: TSESTree.Expression): void {
-      if (
-        test.type === "UnaryExpression" &&
-        test.operator === "!" &&
-        test.argument.type === "LogicalExpression"
-      ) {
-        const implicitNodes: TSESTree.Node[] = [];
-        collectImplicitNodes(test.argument, allowBooleanIdentifiers, allowNullishCheck, implicitNodes);
-        for (const node of implicitNodes) {
-          context.report({
-            node,
-            messageId: "noImplicitBooleanConversion",
-          });
-        }
-      } else if (test.type === "LogicalExpression") {
-        const implicitNodes: TSESTree.Node[] = [];
-        collectImplicitNodes(test, allowBooleanIdentifiers, allowNullishCheck, implicitNodes);
-        for (const node of implicitNodes) {
-          context.report({
-            node,
-            messageId: "noImplicitBooleanConversion",
-          });
-        }
-      } else {
-        if (!isExplicitBoolean(test, allowBooleanIdentifiers, allowNullishCheck)) {
-          context.report({
-            node: test,
-            messageId: "noImplicitBooleanConversion",
-          });
+      function checkCondition(test: TSESTree.Expression): void {
+        if (
+          test.type === "UnaryExpression" &&
+          test.operator === "!" &&
+          test.argument.type === "LogicalExpression"
+        ) {
+          const implicitNodes: TSESTree.Node[] = [];
+          collectImplicitNodes(
+            test.argument,
+            allowBooleanIdentifiers,
+            allowNullishCheck,
+            implicitNodes,
+          );
+          for (const node of implicitNodes) {
+            context.report({
+              node,
+              messageId: "noImplicitBooleanConversion",
+            });
+          }
+        } else if (test.type === "LogicalExpression") {
+          const implicitNodes: TSESTree.Node[] = [];
+          collectImplicitNodes(
+            test,
+            allowBooleanIdentifiers,
+            allowNullishCheck,
+            implicitNodes,
+          );
+          for (const node of implicitNodes) {
+            context.report({
+              node,
+              messageId: "noImplicitBooleanConversion",
+            });
+          }
+        } else {
+          if (
+            !isExplicitBoolean(test, allowBooleanIdentifiers, allowNullishCheck)
+          ) {
+            context.report({
+              node: test,
+              messageId: "noImplicitBooleanConversion",
+            });
+          }
         }
       }
-    }
 
-    return {
-      IfStatement(node) {
-        checkCondition(node.test);
-      },
-      WhileStatement(node) {
-        checkCondition(node.test);
-      },
-      DoWhileStatement(node) {
-        checkCondition(node.test);
-      },
-      ForStatement(node) {
-        if (node.test) {
+      return {
+        IfStatement(node) {
           checkCondition(node.test);
-        }
-      },
-      ConditionalExpression(node) {
-        checkCondition(node.test);
-      },
-    };
+        },
+        WhileStatement(node) {
+          checkCondition(node.test);
+        },
+        DoWhileStatement(node) {
+          checkCondition(node.test);
+        },
+        ForStatement(node) {
+          if (node.test) {
+            checkCondition(node.test);
+          }
+        },
+        ConditionalExpression(node) {
+          checkCondition(node.test);
+        },
+      };
+    },
   },
-});
+);
 
 export default noImplicitBooleanConversionInConditions;

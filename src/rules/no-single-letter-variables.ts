@@ -13,7 +13,8 @@ const noSingleLetterVariables = createRule<Options, MessageIds>({
   meta: {
     type: "suggestion",
     docs: {
-      description: "Disallow single-letter variable names for better readability",
+      description:
+        "Disallow single-letter variable names for better readability",
     },
     messages: {
       noSingleLetterVariables:

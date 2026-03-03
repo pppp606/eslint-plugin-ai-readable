@@ -112,7 +112,10 @@ function hasDoubleNegative(name: string, negativeWords: string[]): boolean {
       // followed by more content (e.g., "notDisconnect" -> "not" + "dis" + "connect")
       const remainderStr = remainderLower.join("");
       for (const prefix of NEGATIVE_PREFIXES) {
-        if (remainderStr.startsWith(prefix) && remainderStr.length > prefix.length) {
+        if (
+          remainderStr.startsWith(prefix) &&
+          remainderStr.length > prefix.length
+        ) {
           return true;
         }
       }

@@ -11,17 +11,28 @@ This rule detects condition expressions that rely on implicit boolean conversion
 ### Examples of **incorrect** code
 
 ```js
-if (value) {}
-if (items.length) {}
-if (!value) {}
-if (!!value) {}
-if (getValue()) {}
-if (obj.prop) {}
-if (a && b) {}
-if (!(a && b)) {}       // reports each implicit operand individually
-if (value == null) {}    // loose equality is implicit by default
-if (value != null) {}    // loose equality is implicit by default
-if (a == b) {}           // loose equality without null is not explicit
+if (value) {
+}
+if (items.length) {
+}
+if (!value) {
+}
+if (!!value) {
+}
+if (getValue()) {
+}
+if (obj.prop) {
+}
+if (a && b) {
+}
+if (!(a && b)) {
+} // reports each implicit operand individually
+if (value == null) {
+} // loose equality is implicit by default
+if (value != null) {
+} // loose equality is implicit by default
+if (a == b) {
+} // loose equality without null is not explicit
 while (condition) {}
 do {} while (flag);
 for (; value; ) {}
@@ -31,17 +42,28 @@ const x = value ? "yes" : "no";
 ### Examples of **correct** code
 
 ```js
-if (value !== "") {}
-if (items.length > 0) {}
-if (value !== null) {}
-if (value !== undefined) {}
-if (value === true) {}
-if (a > 0 && b !== "") {}
-if (typeof x === "string") {}
-if (x instanceof Array) {}
-if ("prop" in obj) {}
-if (!(a > 0)) {}
-if (!(a > 0 && b !== "")) {}   // negated logical with explicit operands
+if (value !== "") {
+}
+if (items.length > 0) {
+}
+if (value !== null) {
+}
+if (value !== undefined) {
+}
+if (value === true) {
+}
+if (a > 0 && b !== "") {
+}
+if (typeof x === "string") {
+}
+if (x instanceof Array) {
+}
+if ("prop" in obj) {
+}
+if (!(a > 0)) {
+}
+if (!(a > 0 && b !== "")) {
+} // negated logical with explicit operands
 while (i < 10) {}
 do {} while (i !== 0);
 for (let i = 0; i < 10; i++) {}
@@ -61,20 +83,28 @@ When `true`, identifiers and member expression properties with boolean-semantic 
 
 ```json
 {
-  "ai-readable/no-implicit-boolean-conversion-in-conditions": ["warn", {
-    "allowBooleanIdentifiers": true
-  }]
+  "ai-readable/no-implicit-boolean-conversion-in-conditions": [
+    "warn",
+    {
+      "allowBooleanIdentifiers": true
+    }
+  ]
 }
 ```
 
 With this option, the following code is valid:
 
 ```js
-if (isReady) {}
-if (hasPermission) {}
-if (!isReady) {}
-if (this.isReady) {}
-if (obj.hasPermission) {}
+if (isReady) {
+}
+if (hasPermission) {
+}
+if (!isReady) {
+}
+if (this.isReady) {
+}
+if (obj.hasPermission) {
+}
 ```
 
 ### `allowNullishCheck`
@@ -86,17 +116,22 @@ When `true`, loose equality checks against `null` (`== null`, `!= null`) are all
 
 ```json
 {
-  "ai-readable/no-implicit-boolean-conversion-in-conditions": ["warn", {
-    "allowNullishCheck": true
-  }]
+  "ai-readable/no-implicit-boolean-conversion-in-conditions": [
+    "warn",
+    {
+      "allowNullishCheck": true
+    }
+  ]
 }
 ```
 
 With this option, the following code is valid:
 
 ```js
-if (value != null) {}
-if (value == null) {}
+if (value != null) {
+}
+if (value == null) {
+}
 ```
 
 Note: loose equality without `null` (e.g., `if (a == b) {}`) is still flagged regardless of this option.

@@ -44,9 +44,12 @@ Maximum number of boolean literal arguments allowed before reporting. Setting to
 
 ```json
 {
-  "ai-readable/no-overloaded-flag-parameter": ["warn", {
-    "maxAllowedBooleanArgs": 1
-  }]
+  "ai-readable/no-overloaded-flag-parameter": [
+    "warn",
+    {
+      "maxAllowedBooleanArgs": 1
+    }
+  ]
 }
 ```
 
@@ -59,9 +62,12 @@ A regular expression pattern to match function names that should be ignored. Use
 
 ```json
 {
-  "ai-readable/no-overloaded-flag-parameter": ["warn", {
-    "ignorePattern": "^(assert|expect)"
-  }]
+  "ai-readable/no-overloaded-flag-parameter": [
+    "warn",
+    {
+      "ignorePattern": "^(assert|expect)"
+    }
+  ]
 }
 ```
 

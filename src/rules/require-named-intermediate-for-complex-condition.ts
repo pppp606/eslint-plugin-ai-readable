@@ -33,10 +33,7 @@ function countOperators(node: TSESTree.Expression): number {
  * Depth only increases when a child LogicalExpression has a different operator
  * than its parent, representing true nesting rather than simple chaining.
  */
-function calcDepth(
-  node: TSESTree.Expression,
-  parentOperator?: string,
-): number {
+function calcDepth(node: TSESTree.Expression, parentOperator?: string): number {
   if (node.type === "LogicalExpression") {
     const increment = parentOperator === node.operator ? 0 : 1;
     return (
