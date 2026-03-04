@@ -68,3 +68,5 @@ The following are **not** checked by this rule:
 ## When Not To Use It
 
 If your codebase uses single-letter variables by convention in certain contexts, such as mathematical formulas, loop counters (`i`, `j`, `k`), or coordinate variables (`x`, `y`, `z`).
+
+This rule has no `allow` option, so if you want to permit single-letter variables in specific files or directories, disable the rule individually in your ESLint configuration instead of using `recommended`.
