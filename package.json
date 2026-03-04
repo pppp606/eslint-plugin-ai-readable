@@ -22,10 +22,10 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@typescript-eslint/utils": "^8.56.1"
+    "@typescript-eslint/utils": "^8.0.0"
   },
   "peerDependencies": {
-    "@typescript-eslint/parser": "^8.56.1",
+    "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0"
   },
   "devDependencies": {
