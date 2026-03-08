@@ -50,7 +50,7 @@ ruleTester.run("max-positional-arguments", rule, {
     },
     // ignoreFunctions: console.log
     {
-      code: 'console.log(a, b, c, d, e);',
+      code: "console.log(a, b, c, d, e);",
       options: [{ ignoreFunctions: ["console.log"] }],
     },
     // ignoreFunctions: setTimeout
