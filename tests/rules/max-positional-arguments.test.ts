@@ -63,6 +63,11 @@ ruleTester.run("max-positional-arguments", rule, {
       code: "Math.min(a, b, c);",
       options: [{ ignoreFunctions: ["Math.max", "Math.min"] }],
     },
+    // ignoreFunctions: NewExpression
+    {
+      code: "new Foo(a, b, c);",
+      options: [{ ignoreFunctions: ["Foo"] }],
+    },
     // Method call within max
     {
       code: "obj.save(a, b);",
