@@ -63,7 +63,13 @@ A list of function names to ignore. Supports dotted names for member expressions
   "ai-readable/max-positional-arguments": [
     "warn",
     {
-      "ignoreFunctions": ["Math.max", "Math.min", "setTimeout", "setInterval", "console.log"]
+      "ignoreFunctions": [
+        "Math.max",
+        "Math.min",
+        "setTimeout",
+        "setInterval",
+        "console.log"
+      ]
     }
   ]
 }
