@@ -10,6 +10,7 @@ This rule detects identifiers that contain two or more negation elements, such a
 
 - A negative prefix (`not`, `no`, `un`, `dis`, `in`, `im`, `non`, `cannot`) combined with a negative word (`disabled`, `invalid`, `inactive`, etc.)
 - Two negative prefixes in sequence (e.g., `cannotUnregister`)
+- The logical NOT operator (`!`) applied to an identifier containing a negative word (e.g., `!isDisabled`)
 
 ### Examples of **incorrect** code
 
@@ -26,6 +27,12 @@ class Foo {
 }
 
 const obj = { isNotDisabled: true };
+
+// Logical NOT with negative identifiers
+if (!isDisabled) {
+}
+const x = !isInvalid;
+const y = !obj.isUnavailable;
 ```
 
 ### Examples of **correct** code
@@ -43,6 +50,11 @@ class Foo {
 }
 
 const obj = { isEnabled: true };
+
+// Positive identifiers with logical NOT are OK
+if (!isEnabled) {
+}
+const x = !isReady;
 ```
 
 ## Options
@@ -87,6 +99,24 @@ Identifier names to exclude from this rule.
 }
 ```
 
+### `checkNegatedIdentifiers`
+
+Type: `boolean`
+Default: `true`
+
+Whether to check for the logical NOT operator (`!`) applied to identifiers containing negative words (e.g., `!isDisabled`).
+
+```json
+{
+  "ai-readable/no-double-negative-identifiers": [
+    "warn",
+    {
+      "checkNegatedIdentifiers": false
+    }
+  ]
+}
+```
+
 ### `checkProperties`
 
 Type: `boolean`
@@ -114,6 +144,7 @@ This rule checks the following identifier types:
 - **Named function expressions** (`const fn = function foo() {}`)
 - **Method definitions** (`class Foo { bar() {} }`)
 - **Object property names** (when `checkProperties` is enabled, which is the default)
+- **Logical NOT expressions** (`!identifier` or `!obj.property`) where the identifier contains a negative word (when `checkNegatedIdentifiers` is enabled, which is the default)
 
 The following are **not** checked by this rule:
 
