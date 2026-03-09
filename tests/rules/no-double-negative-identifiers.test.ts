@@ -210,5 +210,10 @@ ruleTester.run("no-double-negative-identifiers", rule, {
       code: "const x = !isDisabled ? 'a' : 'b';",
       errors: [{ messageId: "noNegatedNegativeIdentifier" }],
     },
+    // !! double bang: only inner ! is reported (outer ! negates a UnaryExpression, not an Identifier)
+    {
+      code: "const x = !!isDisabled;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
   ],
 });
