@@ -5,12 +5,13 @@ const createRule = ESLintUtils.RuleCreator(
     `https://github.com/pppp606/eslint-plugin-ai-readable/blob/main/docs/rules/${name}.md`,
 );
 
-type MessageIds = "noDoubleNegativeIdentifiers";
+type MessageIds = "noDoubleNegativeIdentifiers" | "noNegatedNegativeIdentifier";
 type Options = [
   {
     negativeWords?: string[];
     allowList?: string[];
     checkProperties?: boolean;
+    checkNegatedIdentifiers?: boolean;
   },
 ];
 
@@ -125,6 +126,33 @@ function hasDoubleNegative(name: string, negativeWords: string[]): boolean {
   return false;
 }
 
+/**
+ * Check whether a name contains a negative word at a camelCase boundary.
+ *
+ * Used for detecting `!isDisabled` patterns where the `!` operator combined
+ * with a negative identifier creates a double negative.
+ */
+function containsNegativeWord(name: string, negativeWords: string[]): boolean {
+  const parts = splitCamelCase(name);
+  const lowerParts = parts.map((p) => p.toLowerCase());
+
+  // Try joining consecutive parts from each starting position
+  // and check if they match a negative word exactly.
+  for (let i = 0; i < lowerParts.length; i++) {
+    let joined = "";
+    for (let j = i; j < lowerParts.length; j++) {
+      joined += lowerParts[j];
+      for (const word of negativeWords) {
+        if (joined === word.toLowerCase()) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
 const noDoubleNegativeIdentifiers = createRule<Options, MessageIds>({
   name: "no-double-negative-identifiers",
   meta: {
@@ -136,6 +164,8 @@ const noDoubleNegativeIdentifiers = createRule<Options, MessageIds>({
     messages: {
       noDoubleNegativeIdentifiers:
         "Identifier '{{ name }}' contains a double negative. Use a positive name instead.",
+      noNegatedNegativeIdentifier:
+        "Negating '{{ name }}' with '!' creates a double negative. Use a positive name instead.",
     },
     schema: [
       {
@@ -152,6 +182,9 @@ const noDoubleNegativeIdentifiers = createRule<Options, MessageIds>({
           checkProperties: {
             type: "boolean",
           },
+          checkNegatedIdentifiers: {
+            type: "boolean",
+          },
         },
         additionalProperties: false,
       },
@@ -163,6 +196,7 @@ const noDoubleNegativeIdentifiers = createRule<Options, MessageIds>({
     const additionalNegativeWords = options.negativeWords || [];
     const allowList = options.allowList || [];
     const checkProperties = options.checkProperties !== false;
+    const checkNegatedIdentifiers = options.checkNegatedIdentifiers !== false;
 
     const negativeWords = [
       ...DEFAULT_NEGATIVE_WORDS,
@@ -205,6 +239,32 @@ const noDoubleNegativeIdentifiers = createRule<Options, MessageIds>({
         if (!checkProperties) return;
         if (node.key.type === "Identifier") {
           checkIdentifier(node.key.name, node.key);
+        }
+      },
+      UnaryExpression(node) {
+        if (!checkNegatedIdentifiers) return;
+        if (node.operator !== "!") return;
+
+        let name: string | undefined;
+        if (node.argument.type === "Identifier") {
+          name = node.argument.name;
+        } else if (
+          node.argument.type === "MemberExpression" &&
+          !node.argument.computed &&
+          node.argument.property.type === "Identifier"
+        ) {
+          name = node.argument.property.name;
+        }
+
+        if (!name) return;
+        if (allowList.includes(name)) return;
+
+        if (containsNegativeWord(name, negativeWords)) {
+          context.report({
+            node,
+            messageId: "noNegatedNegativeIdentifier",
+            data: { name },
+          });
         }
       },
     };
