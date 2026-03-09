@@ -29,7 +29,8 @@ class Foo {
 const obj = { isNotDisabled: true };
 
 // Logical NOT with negative identifiers
-if (!isDisabled) {}
+if (!isDisabled) {
+}
 const x = !isInvalid;
 const y = !obj.isUnavailable;
 ```
@@ -51,7 +52,8 @@ class Foo {
 const obj = { isEnabled: true };
 
 // Positive identifiers with logical NOT are OK
-if (!isEnabled) {}
+if (!isEnabled) {
+}
 const x = !isReady;
 ```
 
