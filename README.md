@@ -60,8 +60,8 @@ export default [
 
 For the best AI-readable code, we recommend enabling these rules from [`@typescript-eslint`](https://typescript-eslint.io/):
 
-| Rule | Description |
-| ---- | ----------- |
+| Rule                                                                                                              | Description                                                                   |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | [`@typescript-eslint/strict-boolean-expressions`](https://typescript-eslint.io/rules/strict-boolean-expressions/) | Disallow implicit boolean coercions in conditions. Requires type information. |
 
 `strict-boolean-expressions` ensures that conditions only use actual booleans, preventing implicit type coercion that makes code harder for AI to analyze. This rule requires [typed linting](https://typescript-eslint.io/getting-started/typed-linting/) to be configured.
