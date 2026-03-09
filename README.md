@@ -13,7 +13,7 @@ npm install eslint-plugin-ai-readable --save-dev
 This plugin is designed for TypeScript projects. You need:
 
 - [TypeScript](https://www.typescriptlang.org/) `>= 5.0`
-- [`@typescript-eslint/parser`](https://typescript-eslint.io/packages/parser/) `>= 8.0`
+- [`typescript-eslint`](https://typescript-eslint.io/) `>= 8.0`
 
 ## Usage
 
