@@ -3,6 +3,7 @@ import noDoubleNegativeIdentifiers from "./rules/no-double-negative-identifiers.
 import noOverloadedFlagParameter from "./rules/no-overloaded-flag-parameter.js";
 import noImplicitBooleanConversionInConditions from "./rules/no-implicit-boolean-conversion-in-conditions.js";
 import requireNamedIntermediateForComplexCondition from "./rules/require-named-intermediate-for-complex-condition.js";
+import maxPositionalArguments from "./rules/max-positional-arguments.js";
 import noSingleLetterVariables from "./rules/no-single-letter-variables.js";
 
 const plugin = {
@@ -11,6 +12,7 @@ const plugin = {
     version: "0.0.1",
   },
   rules: {
+    "max-positional-arguments": maxPositionalArguments,
     "no-double-negative-identifiers": noDoubleNegativeIdentifiers,
     "no-implicit-boolean-conversion-in-conditions":
       noImplicitBooleanConversionInConditions,
@@ -28,6 +30,7 @@ Object.assign(plugin.configs, {
       "ai-readable": plugin,
     },
     rules: {
+      "ai-readable/max-positional-arguments": "warn",
       "ai-readable/no-double-negative-identifiers": "warn",
       "ai-readable/no-implicit-boolean-conversion-in-conditions": "warn",
       "ai-readable/no-overloaded-flag-parameter": "warn",
