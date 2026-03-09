@@ -52,6 +52,28 @@ ruleTester.run("no-double-negative-identifiers", rule, {
       code: "const isNotDisabled = true;",
       options: [{ allowList: ["isNotDisabled"] }],
     },
+    // --- ! + identifier: valid cases ---
+    // Positive name — no negative word
+    {
+      code: "const x = !isEnabled;",
+    },
+    {
+      code: "const x = !isReady;",
+    },
+    // "incomplete" is not in DEFAULT_NEGATIVE_WORDS
+    {
+      code: "const x = !isIncomplete;",
+    },
+    // allowList applies to negated identifiers
+    {
+      code: "const x = !isDisabled;",
+      options: [{ allowList: ["isDisabled"] }],
+    },
+    // checkNegatedIdentifiers: false disables the check
+    {
+      code: "const x = !isDisabled;",
+      options: [{ checkNegatedIdentifiers: false }],
+    },
   ],
   invalid: [
     // VariableDeclarator: not + disabled
@@ -140,6 +162,53 @@ ruleTester.run("no-double-negative-identifiers", rule, {
       code: "const isNotForbidden = true;",
       options: [{ negativeWords: ["forbidden"] }],
       errors: [{ messageId: "noDoubleNegativeIdentifiers" }],
+    },
+    // --- ! + identifier: invalid cases ---
+    // "disabled" is a negative word
+    {
+      code: "const x = !isDisabled;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // "invalid" is a negative word
+    {
+      code: "const x = !isInvalid;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // "unknown" is a negative word
+    {
+      code: "const x = !isUnknown;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // "unavailable" is a negative word
+    {
+      code: "const x = !isUnavailable;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // "inactive" is a negative word
+    {
+      code: "const x = !isInactive;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // Custom negativeWords with ! operator
+    {
+      code: "const x = !isForbidden;",
+      options: [{ negativeWords: ["forbidden"] }],
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // MemberExpression: !obj.isDisabled
+    {
+      code: "const x = !obj.isDisabled;",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // Inside if condition
+    {
+      code: "if (!isDisabled) {}",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
+    },
+    // Inside ternary
+    {
+      code: "const x = !isDisabled ? 'a' : 'b';",
+      errors: [{ messageId: "noNegatedNegativeIdentifier" }],
     },
   ],
 });
